@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" />
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <button class="btn btn-primary" onclick="showDialog()">show dialogBox</button>
+    <button class="btn btn-primary" onclick="showAlert()">show alertBox</button>
+    <button class="btn btn-primary" onclick="showConfirm()">show confrimBox</button>
+    <div class="hidden" id="dbox">
+        一旦定义了函数类型接口，就可以像其他接口一样使用，这里，我们演示了如何创建函数类型的变量以及给它赋一个相同类型的函数值。
+        对于函数类型的正确类型检查，不需要匹配参数的名字，比如上面例子的“source”命名为“src”。
+        方法参数每次只检查一次，相互检查每一个相应的参数的类型。上面的例子，我们的函数表达式返回的值（true和false）暗示了它的返回类型。如果上面返回的是number或string类型的值，类型检查器会警告我们“返回的类型不匹配在SearchFunc接口中描述的返回类型”。
+    </div>
+    <script>
+        var dialog = new BUI.dialogBox({
+            title: 'dialogBox demo',
+            content: $('#dbox').html(),
+            vCenter: true,
+            size: 2
+        })
+        var alert = new BUI.alertBox({
+            title: 'alerBox demo',
+            content: $('#dbox').html(),
+            vCenter: true,
+            size: 2,
+            callback: function (box, $eventTarget) {
+                //console.log(box);
+                //box.hide();
+                $eventTarget.button('loading');
+                setTimeout(() => {
+                    $eventTarget.button('reset');
+                }, 2000)
+            }
+        })
+        var confirm = new BUI.confirmBox({
+            title: 'confirm demo',
+            content: $('#dbox').html(),
+            vCenter: true,
+            size: 2,
+            callback: function (box, $eventTarget) {
+                switch ($eventTarget.data('op')) {
+                    case 'submit':
+                        console.log('submit..')
+                        break;
+                    case 'cancel':
+                        console.log('cancel..')
+                        box.hide();
+                        break;
+                }
+            }
+        })
+        function showDialog() {
+            dialog.show();
+        }
+        function showAlert() {
+            alert.show();
+        }
+        function showConfirm() {
+            confirm.show();
+        }
+    </script>
+</body>
+</html>

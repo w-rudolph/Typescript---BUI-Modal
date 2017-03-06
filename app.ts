@@ -12,11 +12,16 @@ namespace BUI {
         size: ModalSize;
         selector: string;
     }
+    interface modalContent {
+        title: string,
+        content: string
+    }
     export class dialogBox {
         options: Option;
         protected selector: string;
         protected contents: Array<any>;
-        constructor(options: Option) {
+        fn: Function;
+        constructor(options: Option, fn: Function) {
             this.options = <Option>{
                 title: 'title',
                 content: 'content',
@@ -30,6 +35,7 @@ namespace BUI {
             this.selector = this.options.selector;
             this.contents = [];
             this.render();
+            this.fn = fn;
         }
         render() {
             if ($(this.selector).length) return;
@@ -40,6 +46,7 @@ namespace BUI {
             $dialogBox.modal(this.options).on('shown.bs.modal',() => {
                   $dialogBox.find('.modal-dialog').css('opacity', 1);
                   this.updatePosition();
+                  if (typeof this.fn === 'function') this.fn();
             });
         }
         show(){
@@ -50,15 +57,16 @@ namespace BUI {
            const $dialogBox = $(this.selector);
            $dialogBox.modal('hide');
         }
-        push(content: any){
-           const $dialogBox = $(this.selector);
-           const $body = $dialogBox.find('.modal-body');
-           this.contents.push($body.html());
-           this.update(content);
+        push(content: modalContent) {
+            const $dialogBox = $(this.selector);
+            const $body = $dialogBox.find('.modal-body');
+            const $title = $dialogBox.find('.modal-title');
+            this.contents.push({ title: $title.html(), content: $body.html() });
+            this.update(content);
            return this;
         }
         pop(){
-           if(this.contents.length)this.update(this.contents.pop());
+           if(this.contents.length) this.update(this.contents.pop());
            else this.hide();
            return this;
         }
@@ -69,10 +77,12 @@ namespace BUI {
           this.hide();
           $(this.selector).remove();
         }
-        update(content: any){
+        update(content: modalContent){
            const $dialogBox = $(this.selector);
            const $body = $dialogBox.find('.modal-body');
-           $body.html(content);
+           const $title = $dialogBox.find('.modal-title');
+           $body.html(content.content);
+           $title.html(content.title);
            this.updatePosition();
         }
         renderTpl(): string {
@@ -102,11 +112,11 @@ namespace BUI {
     }
     export class alertBox extends dialogBox{
         options: AlertOption;
-        constructor(options: AlertOption){
+        constructor(options: AlertOption, fn){
             options.selector =  options.selector || '#alertBox';
             options.submitTxt = options.submitTxt || 'submit';
             options.submitTxtLoadingTxt = options.submitTxtLoadingTxt || 'loading...';
-            super(options);
+            super(options, fn);
             var $alertBox = $(this.selector);
             $alertBox.on('click', '.submit', () => {
                if(typeof this.options.callback === 'function'){
@@ -136,10 +146,10 @@ namespace BUI {
     }
     export class confirmBox extends alertBox{
        options: ConfirmOption;
-       constructor(options: ConfirmOption){
+       constructor(options: ConfirmOption, fn){
          options.selector =  options.selector || '#confirmBox';
          options.cancelTxt =  options.cancelTxt || 'cancel';
-         super(options);
+         super(options, fn);
          var $confirmBox = $(this.selector);
          $confirmBox.off('click').on('click', '.submit, .cancel', (e) => {
             if(typeof this.options.callback === 'function'){

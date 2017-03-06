@@ -25,6 +25,8 @@
             content: $('#dbox').html(),
             vCenter: true,
             size: 2
+        }, function () {
+            console.log('dialog opened!');
         })
         var alert = new BUI.alertBox({
             title: 'alerBox demo',
@@ -39,6 +41,8 @@
                     $eventTarget.button('reset');
                 }, 2000)
             }
+        }, function () {
+            console.log('alert opened!');
         })
         var confirm = new BUI.confirmBox({
             title: 'confirm demo',
@@ -56,6 +60,8 @@
                         break;
                 }
             }
+        }, function () {
+            console.log('confirm opened!');
         })
         function showDialog() {
             dialog.show();
